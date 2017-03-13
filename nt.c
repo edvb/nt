@@ -16,12 +16,14 @@
 char *trimwhitespace(char *str);
 
 void nt_new(void);
+void nt_edit(void);
 void nt_del(void);
 void nt_search(void);
 void nt_list_all(void);
 void nt_list_n(int n);
 
 void run(void);
+void setup(void);
 void cleanup(void);
 void usage(void);
 
@@ -98,6 +100,28 @@ nt_del(void)
 	rename(tmpfpname, fname);
 }
 
+void
+nt_edit()
+{
+	if (sub == NULL) usage();
+	int i, found = 0;
+
+	for (i = 0; i < notec; i++)
+		if (strcmp(notes[i], sub) == 0 && !found) {
+			fgets(notes[i], MAX_SUB, stdin);
+			trimwhitespace(notes[i]);
+			found = 1;
+		}
+	if (!found)
+		die("%s: edit: '%s' not found", argv0, sub);
+
+	fclose(fp);
+	fp = fopen(fname, "w");
+	for (i = 0; i < notec; i++)
+		fprintf(fp, "%s\n", notes[i]);
+	rewind(fp);
+}
+
 /* search notes for given note */
 void
 nt_search()
@@ -140,6 +164,9 @@ run(void)
 	switch (mode) {
 	case 'd':
 		nt_del();
+		break;
+	case 'e':
+		nt_edit();
 		break;
 	case 'l':
 		nt_list_all();
@@ -196,18 +223,22 @@ cleanup(void)
 void
 usage(void)
 {
-	die("usage: %s [-lv] [-f FILE] [-d NOTE] [-s SEARCH] [-n NUM | -NUM] [NOTE ...]", argv0);
+	die("usage: %s [-lv] [-f FILE] [-e NOTE] [-d NOTE]\n"
+		"          [-s SEARCH] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
 int
 main(int argc, char *argv[])
 {
 	ARGBEGIN {
-	case 'f':
-		fname = EARGF(usage());
-		break;
 	case 'd':
 		mode = 'd';
+		break;
+	case 'e':
+		mode = 'e';
+		break;
+	case 'f':
+		fname = EARGF(usage());
 		break;
 	case 'l':
 		mode = 'l';

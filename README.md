@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-`nt` [-lv] [-f *FILE*] [-d *NOTE*] [-s *SEARCH*] [-n *NUM* | -*NUM*] [*NOTE* ...]
+`nt` [-lv] [-f *FILE*] [-e *NOTE*] [-d *NOTE*] [-s *SEARCH*] [-n *NUM* | -*NUM*] [*NOTE* ...]
 
 ## DESCRIPTION
 
