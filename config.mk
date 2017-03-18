@@ -1,8 +1,6 @@
 # nt version number
 VERSION = 0.0.0
 
-### Change the variables below for your system
-
 # paths
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man

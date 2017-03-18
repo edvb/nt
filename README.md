@@ -28,6 +28,70 @@ Simple note taker for the command line.
 -d *NOTE*
 	Delete *NOTE* from notes
 
+## USAGE
+
+Add simple note and list it:
+
+	$ nt clean dishes
+	$ nt -l
+	clean dishes
+
+Create note in specified file:
+
+	$ nt -f list take out trash
+	$ nt -f list -l
+	take out trash
+
+Add more notes by running command again:
+
+	$ nt wash car
+	$ nt -l
+	clean dishes
+	wash car
+	$ nt buy pie
+	$ nt -l
+	clean dishes
+	wash car
+	buy pie
+
+List just the *NUM* most recent notes:
+
+	$ nt -1
+	buy pie
+	$ nt -n 1
+	buy pie
+	$ nt -2
+	buy pie
+	wash car
+	$ nt -n 2
+	buy pie
+	wash car
+
+Search notes with a specified term:
+
+	$ nt -s pie
+	buy pie
+	$ nt make pie
+	$ nt -s pie
+	buy pie
+	make pie
+
+Remove given note:
+
+	$ nt -d buy pie
+	$ nt -l
+	clean dishes
+	wash car
+	make pie
+
+Edit note with new text given from stdin:
+
+	$ echo eat pie | nt -e make pie
+	$ nt -l
+	clean dishes
+	wash car
+	eat pie
+
 ## AUTHOR
 
 Ed van Bruggen <edvb54@gmail.com>

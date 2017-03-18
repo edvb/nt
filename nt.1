@@ -27,12 +27,105 @@ Simple note taker for the command line.
 .PP
 \-d \fINOTE\fP
     Delete \fINOTE\fP from notes
+.SH USAGE
+.PP
+Add simple note and list it:
+.PP
+.RS
+.nf
+$ nt clean dishes
+$ nt \-l
+clean dishes
+.fi
+.RE
+.PP
+Create note in specified file:
+.PP
+.RS
+.nf
+$ nt \-f list take out trash
+$ nt \-f list \-l
+take out trash
+.fi
+.RE
+.PP
+Add more notes by running command again:
+.PP
+.RS
+.nf
+$ nt wash car
+$ nt \-l
+clean dishes
+wash car
+$ nt buy pie
+$ nt \-l
+clean dishes
+wash car
+buy pie
+.fi
+.RE
+.PP
+List just the \fINUM\fP most recent notes:
+.PP
+.RS
+.nf
+$ nt \-1
+buy pie
+$ nt \-n 1
+buy pie
+$ nt \-2
+buy pie
+wash car
+$ nt \-n 2
+buy pie
+wash car
+.fi
+.RE
+.PP
+Search notes with a specified term:
+.PP
+.RS
+.nf
+$ nt \-s pie
+buy pie
+$ nt make pie
+$ nt \-s pie
+buy pie
+make pie
+.fi
+.RE
+.PP
+Remove given note:
+.PP
+.RS
+.nf
+$ nt \-d buy pie
+$ nt \-l
+clean dishes
+wash car
+make pie
+.fi
+.RE
+.PP
+Edit note with new text given from stdin:
+.PP
+.RS
+.nf
+$ echo eat pie | nt \-e make pie
+$ nt \-l
+clean dishes
+wash car
+eat pie
+.fi
+.RE
 .SH AUTHOR
 .PP
-Ed van Bruggen \<edvb54@gmail.com\>
+Ed van Bruggen 
+\<edvb54@gmail.com\>
 .SH SEE ALSO
 .PP
-View source code at: \<https://gitlab.com/edvb/nt\>
+View source code at: 
+\<https://gitlab.com/edvb/nt\>
 .SH LICENSE
 .PP
 zlib License
