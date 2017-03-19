@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "arg.h"
 #include "util.h"
@@ -11,11 +12,16 @@
 #define MAX_SUB 2048
 
 /* typedefs */
+typedef struct Note {
+	char *str;
+	struct Note *next;
+	struct Note *prev;
+} Note;
 
 /* functions */
 char *trimwhitespace(char *str);
 
-void nt_new(void);
+void nt_add(char *str);
 void nt_edit(void);
 void nt_del(void);
 void nt_search(void);
@@ -27,20 +33,19 @@ void setup(void);
 void cleanup(void);
 void usage(void);
 
-/* varibles */
+/* variables */
 char *argv0;
 
-FILE *fp;
 char *sub;
-char **notes;
-int notec;
+Note *head = NULL;
+Note *tail = NULL;
 
 char mode = 0;
 int lsnum;
 
 #include "config.h"
 
-/* remove tailing or leading whitespace from str */
+/* remove tailing or leading white space from str */
 char *
 trimwhitespace(char *str)
 {
@@ -49,12 +54,12 @@ trimwhitespace(char *str)
 	/* trim leading space */
 	while(isspace((unsigned char)*str)) str++;
 
-	if(*str == 0)  /* all spaces? */
+	if (*str == 0)  /* all spaces? */
 		return str;
 
 	/* trim trailing space */
 	end = str + strlen(str) - 1;
-	while(end > str && isspace((unsigned char)*end)) end--;
+	while (end > str && isspace((unsigned char)*end)) end--;
 
 	/* write new null terminator */
 	*(end+1) = 0;
@@ -64,74 +69,86 @@ trimwhitespace(char *str)
 
 /* create a new note */
 void
-nt_new(void)
+nt_add(char *str)
 {
-	if (sub == NULL) usage();
+	if (!str) usage();
 
-	fprintf(fp, "%s\n", sub);
+	if (!head->str && !head->next && !head->prev) {
+		head = ecalloc(1, sizeof(Note));
+		head->str  = estrdup(str);
+		head->next = NULL;
+		head->prev = NULL;
+		tail = head;
+		return;
+	}
+
+	/* go through notes until we reach the last one */
+	Note *cur = head;
+	while (cur->next)
+		cur = cur->next;
+
+	/* allocate note */
+	cur->next = ecalloc(1, sizeof(Note));
+	cur->next->prev = cur;
+	cur = cur->next;
+	cur->str = estrdup(str);
+	cur->next = NULL;
+	tail = cur;
+
 }
 
 /* delete oldest matching note from notes */
 void
 nt_del(void)
 {
-	if (sub == NULL) usage();
+	if (!sub) usage();
+	Note *cur = head;
 
-	int i, found = 0;
-	FILE *tmpfp;
-	char *tmpfpext = "part";
-	char *tmpfpname = ecalloc(strlen(fname)+strlen(tmpfpext)+1, sizeof(char));
+	for (; cur; cur = cur->next) {
+		if (strcmp(cur->str, sub) == 0) {
+			if (!cur->prev) { /* beginning */
+				head = cur->next;
+			} else if (!cur->next) { /* end */
+				cur->prev->next = NULL;
+			} else { /* middle */
+				cur->prev->next = cur->next;
+				cur->next->prev = cur->prev;
+			}
+			free(cur);
+			return;
+		}
+	}
 
-	strcpy(tmpfpname, fname);
-	strcat(tmpfpname, ".");
-	strcat(tmpfpname, tmpfpext);
-	tmpfp = fopen(tmpfpname, "w");
-
-	for (i = 0; i < notec; i++)
-		if (strcmp(notes[i], sub) != 0 || found)
-			fprintf(tmpfp, "%s\n", notes[i]);
-		else
-			found = 1;
-	if (!found)
-		die("%s: delete: '%s' not found", argv0, sub);
-
-	fclose(tmpfp);
-	remove(fname);
-	rename(tmpfpname, fname);
+	die("%s: delete: '%s' not found", argv0, sub);
 }
 
 void
 nt_edit()
 {
-	if (sub == NULL) usage();
-	int i, found = 0;
+	if (!sub) usage();
+	Note *cur = head;
 
-	for (i = 0; i < notec; i++)
-		if (strcmp(notes[i], sub) == 0 && !found) {
-			fgets(notes[i], MAX_SUB, stdin);
-			trimwhitespace(notes[i]);
-			found = 1;
+	for (; cur; cur = cur->next)
+		if (strcmp(cur->str, sub) == 0) {
+			fgets(cur->str, MAX_SUB, stdin);
+			trimwhitespace(cur->str);
+			return;
 		}
-	if (!found)
-		die("%s: edit: '%s' not found", argv0, sub);
 
-	fclose(fp);
-	fp = fopen(fname, "w");
-	for (i = 0; i < notec; i++)
-		fprintf(fp, "%s\n", notes[i]);
-	rewind(fp);
+	die("%s: edit: '%s' not found", argv0, sub);
 }
 
 /* search notes for given note */
 void
 nt_search()
 {
-	if (sub == NULL) usage();
+	if (!sub) usage();
+	int found = 0;
+	Note *cur = head;
 
-	int i, found = 0;
-	for (i = 0; i < notec; i++)
-		if (strstr(notes[i], sub)) {
-			printf("%s\n", notes[i]);
+	for (; cur; cur = cur->next)
+		if (strstr(cur->str, sub)) {
+			printf("%s\n", cur->str);
 			found = 1;
 		}
 	if (!found)
@@ -142,19 +159,21 @@ nt_search()
 void
 nt_list_all(void)
 {
-	int i;
-	for (i = 0; i < notec; i++)
-		printf("%s\n", notes[i]);
+	Note *cur = head;
+	for (; cur; cur = cur->next)
+		if (cur->str)
+			printf("%s\n", cur->str);
 }
 
-/* diplay n most recent subjects in file */
+/* display n most recent subjects in file */
 void
 nt_list_n(int n)
 {
-	int i = notec;
-	n = n > i ? -1 : i-n-1;
-	for (i--; i > n; i--)
-		printf("%s\n", notes[i]);
+	int i;
+	Note *cur = tail;
+	for (i = 0; i < n && cur; cur = cur->prev, i++)
+		if (cur->str)
+			printf("%s\n", cur->str);
 }
 
 /* handle options and create notes */
@@ -170,53 +189,57 @@ run(void)
 		break;
 	case 'l':
 		nt_list_all();
-		exit(0);
+		break;
 	case 'n':
 		nt_list_n(lsnum);
-		exit(0);
+		break;
 	case 's':
 		nt_search();
 		break;
 	default:
-		nt_new();
+		nt_add(sub);
 	}
 }
 
-/* load fname, set notec, populate notes, allocate sub */
+/* populate notes list, allocate sub */
 void
 setup(void)
 {
-	int c, i = 0, last = 0;
+	char buf[MAX_SUB];
+	FILE *fp;
 
-	/* open file */
-	fp = fopen(fname, "ab+");
+	head = ecalloc(1, sizeof(Note));
+	tail = head;
 
-	/* get number of notec */
-	while ((c = fgetc(fp)) != EOF) {
-		if (c == '\n' && last != '\n')
-			++notec;
-		last = c;
+	/* load file if it exists */
+	if (access(fname, F_OK) != -1) {
+		fp = fopen(fname, "r");
+		while (fscanf(fp, "%2048[^\n]\n", buf) != EOF)
+			nt_add(buf);
+		fclose(fp);
 	}
-	rewind(fp);
-
-	/* copy file fp to notes */
-	notes = ecalloc(notec+1, sizeof(char*));
-	do
-		notes[i] = ecalloc(MAX_SUB, sizeof(char));
-	while (fscanf(fp, "%2048[^\n]\n", notes[i++]) != EOF);
-	rewind(fp);
 
 	sub = ecalloc(MAX_SUB, sizeof(char));
+
 }
 
-/* close fname, free memory */
+/* write list to file, free memory */
 void
 cleanup(void)
 {
+	FILE *fp;
+	Note *cur = head;
+
+	/* write note list to file */
+	fp = fopen(fname, "w");
+	for (; cur; cur = cur->next)
+		if (cur->str)
+			fprintf(fp, "%s\n", cur->str);
 	fclose(fp);
-	for (int j = 0; j < notec+1; j++)
-		free(notes[j]);
-	free(notes);
+
+	for (cur = head; cur; cur = cur->next)
+		free(cur->str);
+	free(head);
 	free(sub);
 }
 
