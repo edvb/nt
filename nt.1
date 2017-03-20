@@ -4,29 +4,38 @@
 nt  \- simple note taker
 .SH SYNOPSIS
 .PP
-\fB\fCnt\fR [\-lv] [\-f \fIFILE\fP] [\-e \fINOTE\fP] [\-d \fINOTE\fP] [\-s \fISEARCH\fP] [\-n \fINUM\fP | \-\fINUM\fP] [\fINOTE\fP ...]
+\fB\fCnt\fR [\fB\-Dlvy\fP] [\fB\-f\fP \fIFILE\fP] [\fB\-e\fP \fINOTE\fP] [\fB\-d\fP \fINOTE\fP] [\fB\-s\fP \fISEARCH\fP] [\fB\-n\fP \fINUM\fP | \fB\-NUM\fP] [\fINOTE\fP ...]
 .SH DESCRIPTION
 .PP
 Simple note taker for the command line.
 .SH OPTIONS
 .PP
-\-v
-    Print version info and exit
+\fB\-d\fP \fINOTE\fP
+    Delete \fINOTE\fP from notes
 .PP
-\-f \fIFILE\fP
+\fB\-D\fP
+    Delete all notes from \fIFILE\fP
+.PP
+\fB\-e\fP \fINOTE\fP
+    Edit \fINOTE\fP with new text given through stdin
+.PP
+\fB\-f\fP \fIFILE\fP
     Load \fIFILE\fP instead of default one
 .PP
-\-l
+\fB\-l\fP
     List notes
 .PP
-\-n \fINUM\fP
+\fB\-n\fP \fINUM\fP, \fB\-NUM\fP
     List last \fINUM\fP notes
 .PP
-\-s \fISEARCH\fP
-    Search for \fISEARCH\fP in notes
+\fB\-s\fP \fISEARCH\fP
+    Search for pattern \fISEARCH\fP in notes
 .PP
-\-d \fINOTE\fP
-    Delete \fINOTE\fP from notes
+\fB\-v\fP
+    Print version info and exit
+.PP
+\fB\-y\fP
+    Auto reply yes to confirmation prompts
 .SH USAGE
 .PP
 Add simple note and list it:
@@ -99,7 +108,7 @@ Remove given note:
 .PP
 .RS
 .nf
-$ nt \-d buy pie
+$ nt \-yd buy pie
 $ nt \-l
 clean dishes
 wash car
@@ -116,6 +125,17 @@ $ nt \-l
 clean dishes
 wash car
 eat pie
+.fi
+.RE
+.PP
+Remove all notes:
+.PP
+.RS
+.nf
+$ nt \-yD
+$ nt \-l
+$ nt \-f list \-yD
+$ nt \-f list \-l
 .fi
 .RE
 .SH AUTHOR

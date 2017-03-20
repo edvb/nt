@@ -93,6 +93,18 @@ nt_add(char *str)
 
 }
 
+/* delete all notes from fname */
+void
+nt_del_all(void)
+{
+	Note *cur = head;
+	if (confirm("delete all notes in '%s'", fname)) {
+		for (; cur; cur = cur->next)
+			cur->str = NULL;
+		remove(fname);
+	}
+}
+
 /* delete oldest matching note from notes */
 void
 nt_del(void)
@@ -119,7 +131,6 @@ nt_del(void)
 
 	die("%s: delete: '%s' not found", argv0, sub);
 }
-
 void
 nt_edit()
 {
@@ -181,6 +192,9 @@ run(void)
 	switch (mode) {
 	case 'd':
 		nt_del();
+		break;
+	case 'D':
+		nt_del_all();
 		break;
 	case 'e':
 		nt_edit();
@@ -244,7 +258,7 @@ cleanup(void)
 void
 usage(void)
 {
-	die("usage: %s [-lvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
+	die("usage: %s [-Dlvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
 		"          [-s SEARCH] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
@@ -254,6 +268,9 @@ main(int argc, char *argv[])
 	ARGBEGIN {
 	case 'd':
 		mode = 'd';
+		break;
+	case 'D':
+		mode = 'D';
 		break;
 	case 'e':
 		mode = 'e';
