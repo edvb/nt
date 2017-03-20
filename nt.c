@@ -1,5 +1,5 @@
 /* See LICENSE file for copyright and license details. */
-#include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,7 +19,7 @@ typedef struct Note {
 } Note;
 
 /* functions */
-char *trimwhitespace(char *str);
+int confirm(const char *msg, ...);
 
 void nt_add(char *str);
 void nt_edit(void);
@@ -45,26 +45,22 @@ int lsnum;
 
 #include "config.h"
 
-/* remove tailing or leading white space from str */
-char *
-trimwhitespace(char *str)
+int
+confirm(const char *msg, ...)
 {
-	char *end;
+	if (yes) return 1;
 
-	/* trim leading space */
-	while(isspace((unsigned char)*str)) str++;
+	char input = 'n';
+	va_list ap;
 
-	if (*str == 0)  /* all spaces? */
-		return str;
+	va_start(ap, msg);
+	printf("%s: ", argv0);
+	vprintf(msg, ap);
+	printf("? [y/N] ");
+	va_end(ap);
+	scanf("%c", &input);
 
-	/* trim trailing space */
-	end = str + strlen(str) - 1;
-	while (end > str && isspace((unsigned char)*end)) end--;
-
-	/* write new null terminator */
-	*(end+1) = 0;
-
-	return str;
+	return (input == 'y' || input == 'Y') ? 1 : 0;
 }
 
 /* create a new note */
@@ -106,15 +102,17 @@ nt_del(void)
 
 	for (; cur; cur = cur->next) {
 		if (strcmp(cur->str, sub) == 0) {
-			if (!cur->prev) { /* beginning */
-				head = cur->next;
-			} else if (!cur->next) { /* end */
-				cur->prev->next = NULL;
-			} else { /* middle */
-				cur->prev->next = cur->next;
-				cur->next->prev = cur->prev;
+			if (confirm("delete note '%s'", cur->str)) {
+				if (!cur->prev) { /* beginning */
+					head = cur->next;
+				} else if (!cur->next) { /* end */
+					cur->prev->next = NULL;
+				} else { /* middle */
+					cur->prev->next = cur->next;
+					cur->next->prev = cur->prev;
+				}
+				free(cur);
 			}
-			free(cur);
 			return;
 		}
 	}
@@ -131,7 +129,7 @@ nt_edit()
 	for (; cur; cur = cur->next)
 		if (strcmp(cur->str, sub) == 0) {
 			fgets(cur->str, MAX_SUB, stdin);
-			trimwhitespace(cur->str);
+			strtrim(cur->str);
 			return;
 		}
 
@@ -246,7 +244,7 @@ cleanup(void)
 void
 usage(void)
 {
-	die("usage: %s [-lv] [-f FILE] [-e NOTE] [-d NOTE]\n"
+	die("usage: %s [-lvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
 		"          [-s SEARCH] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
@@ -280,6 +278,9 @@ main(int argc, char *argv[])
 	case 'v': 
 		printf("%s v%s\n", argv0, VERSION);
 		return 0;
+	case 'y':
+		yes = 1;
+		break;
 	default:
 		usage();
 	} ARGEND;
@@ -290,7 +291,7 @@ main(int argc, char *argv[])
 		fgets(sub, MAX_SUB, stdin);
 	else if (argc > 0)
 		sub = strconcat(argv, argc);
-	trimwhitespace(sub);
+	strtrim(sub);
 
 	run();
 

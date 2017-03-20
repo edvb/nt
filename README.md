@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-`nt` [-lv] [-f *FILE*] [-e *NOTE*] [-d *NOTE*] [-s *SEARCH*] [-n *NUM* | -*NUM*] [*NOTE* ...]
+`nt` [-lvy] [-f *FILE*] [-e *NOTE*] [-d *NOTE*] [-s *SEARCH*] [-n *NUM* | -*NUM*] [*NOTE* ...]
 
 ## DESCRIPTION
 
@@ -10,8 +10,11 @@ Simple note taker for the command line.
 
 ## OPTIONS
 
--v
-	Print version info and exit
+-d *NOTE*
+	Delete *NOTE* from notes
+
+-e *NOTE*
+	Edit *NOTE* with new text given through stdin
 
 -f *FILE*
 	Load *FILE* instead of default one
@@ -19,14 +22,17 @@ Simple note taker for the command line.
 -l
 	List notes
 
--n *NUM*
+-n *NUM*, -*NUM*
 	List last *NUM* notes
 
 -s *SEARCH*
-	Search for *SEARCH* in notes
+	Search for pattern *SEARCH* in notes
 
--d *NOTE*
-	Delete *NOTE* from notes
+-v
+	Print version info and exit
+
+-y
+	Auto reply yes to confirmation prompts
 
 ## USAGE
 
@@ -78,7 +84,7 @@ Search notes with a specified term:
 
 Remove given note:
 
-	$ nt -d buy pie
+	$ nt -yd buy pie
 	$ nt -l
 	clean dishes
 	wash car

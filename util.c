@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <ctype.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -116,8 +117,31 @@ strsplit(const char *s, const char a_delim, int *size)
 	return ret;
 }
 
+/* remove tailing or leading white space from s */
+char *
+strtrim(char *s)
+{
+	char *end;
+
+	/* trim leading space */
+	while (isspace((unsigned char)*s)) s++;
+
+	if (*s == 0) /* all spaces? */
+		return s;
+
+	/* trim trailing space */
+	end = s + strlen(s) - 1;
+	while (end > s && isspace((unsigned char)*end)) end--;
+
+	/* write new null terminator */
+	*(end+1) = 0;
+
+	return s;
+}
+
 void
-die(const char *fmt, ...) {
+die(const char *fmt, ...)
+{
 	va_list ap;
 
 	va_start(ap, fmt);
