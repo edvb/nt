@@ -20,15 +20,16 @@ typedef struct Note {
 
 /* functions */
 int confirm(const char *msg, ...);
+void linkadd(char *str);
 
-void nt_add(char *str);
-void nt_edit(void);
 void nt_del(void);
-void nt_search(void);
+void nt_del_all(void);
+void nt_edit(void);
 void nt_list_all(void);
-void nt_list_n(int n);
+void nt_list_n(void);
+void nt_search(void);
+void nt_new(void);
 
-void run(void);
 void setup(void);
 void cleanup(void);
 void usage(void);
@@ -40,11 +41,13 @@ char *sub;
 Note *head = NULL;
 Note *tail = NULL;
 
-char mode = 0;
+void (*mode)(void) = nt_new;
+int neednt = 1;
 int lsnum;
 
 #include "config.h"
 
+/* prompt user if no -y option to confirm action */
 int
 confirm(const char *msg, ...)
 {
@@ -63,11 +66,11 @@ confirm(const char *msg, ...)
 	return (input == 'y' || input == 'Y') ? 1 : 0;
 }
 
-/* create a new note */
+/* add str to Note linked list */
 void
-nt_add(char *str)
+linkadd(char *str)
 {
-	if (!str) usage();
+	if (!str) die("linkadd: given null pointer");
 
 	if (!head->str && !head->next && !head->prev) {
 		head = ecalloc(1, sizeof(Note));
@@ -91,18 +94,6 @@ nt_add(char *str)
 	cur->next = NULL;
 	tail = cur;
 
-}
-
-/* delete all notes from fname */
-void
-nt_del_all(void)
-{
-	Note *cur = head;
-	if (confirm("delete all notes in '%s'", fname)) {
-		for (; cur; cur = cur->next)
-			cur->str = NULL;
-		remove(fname);
-	}
 }
 
 /* delete oldest matching note from notes */
@@ -131,6 +122,20 @@ nt_del(void)
 
 	die("%s: delete: '%s' not found", argv0, sub);
 }
+
+/* delete all notes from fname */
+void
+nt_del_all(void)
+{
+	Note *cur = head;
+	if (confirm("delete all notes in '%s'", fname)) {
+		for (; cur; cur = cur->next)
+			cur->str = NULL;
+		remove(fname);
+	}
+}
+
+/* edit given note sub from stdin */
 void
 nt_edit()
 {
@@ -147,9 +152,30 @@ nt_edit()
 	die("%s: edit: '%s' not found", argv0, sub);
 }
 
+/* print out entire file */
+void
+nt_list_all(void)
+{
+	Note *cur = head;
+	for (; cur; cur = cur->next)
+		if (cur->str)
+			printf("%s\n", cur->str);
+}
+
+/* display n most recent subjects in file */
+void
+nt_list_n(void)
+{
+	int i;
+	Note *cur = tail;
+	for (i = 0; i < lsnum && cur; cur = cur->prev, i++)
+		if (cur->str)
+			printf("%s\n", cur->str);
+}
+
 /* search notes for given note */
 void
-nt_search()
+nt_search(void)
 {
 	if (!sub) usage();
 	int found = 0;
@@ -164,53 +190,12 @@ nt_search()
 		die("%s: search: '%s' not found", argv0, sub);
 }
 
-/* print out entire file */
+/* create a new note */
 void
-nt_list_all(void)
+nt_new(void)
 {
-	Note *cur = head;
-	for (; cur; cur = cur->next)
-		if (cur->str)
-			printf("%s\n", cur->str);
-}
-
-/* display n most recent subjects in file */
-void
-nt_list_n(int n)
-{
-	int i;
-	Note *cur = tail;
-	for (i = 0; i < n && cur; cur = cur->prev, i++)
-		if (cur->str)
-			printf("%s\n", cur->str);
-}
-
-/* handle options and create notes */
-void
-run(void)
-{
-	switch (mode) {
-	case 'd':
-		nt_del();
-		break;
-	case 'D':
-		nt_del_all();
-		break;
-	case 'e':
-		nt_edit();
-		break;
-	case 'l':
-		nt_list_all();
-		break;
-	case 'n':
-		nt_list_n(lsnum);
-		break;
-	case 's':
-		nt_search();
-		break;
-	default:
-		nt_add(sub);
-	}
+	if (!sub) usage();
+	linkadd(sub);
 }
 
 /* populate notes list, allocate sub */
@@ -227,7 +212,7 @@ setup(void)
 	if (access(fname, F_OK) != -1) {
 		fp = fopen(fname, "r");
 		while (fscanf(fp, "%2048[^\n]\n", buf) != EOF)
-			nt_add(buf);
+			linkadd(buf);
 		fclose(fp);
 	}
 
@@ -267,30 +252,36 @@ main(int argc, char *argv[])
 {
 	ARGBEGIN {
 	case 'd':
-		mode = 'd';
+		mode = nt_del;
 		break;
 	case 'D':
-		mode = 'D';
+		mode = nt_del_all;
+		neednt = 0;
 		break;
 	case 'e':
-		mode = 'e';
+		mode = nt_edit;
+		neednt = 0;
 		break;
 	case 'f':
 		fname = EARGF(usage());
+		neednt = 0;
 		break;
 	case 'l':
-		mode = 'l';
+		mode = nt_list_all;
+		neednt = 0;
 		break;
 	case 'n':
-		mode = 'n';
+		mode = nt_list_n;
+		neednt = 0;
 		lsnum = atoi(EARGF(usage()));
 		break;
 	ARGNUM:
-		mode = 'n';
+		mode = nt_list_n;
+		neednt = 0;
 		lsnum = ARGNUMF();
 		break;
 	case 's':
-		mode = 's';
+		mode = nt_search;
 		break;
 	case 'v': 
 		printf("%s v%s\n", argv0, VERSION);
@@ -304,13 +295,13 @@ main(int argc, char *argv[])
 
 	setup();
 
-	if (argc <= 0 && (!mode || mode == 'd' || mode == 's'))
+	if (argc <= 0 && neednt)
 		fgets(sub, MAX_SUB, stdin);
 	else if (argc > 0)
 		sub = strconcat(argv, argc);
 	strtrim(sub);
 
-	run();
+	mode();
 
 	cleanup();
 
