@@ -42,7 +42,7 @@ erealloc(void *p, size_t size)
 char *
 estrdup(char *s)
 {
-	if ((s = strdup(s)) == NULL)
+	if (!(s = strdup(s)))
 		die("strdup: out of memory");
 
 	return s;
@@ -51,7 +51,7 @@ estrdup(char *s)
 char *
 strconcat(char **s, int c)
 {
-	if (s == NULL) die("strconcat: given null pointer");
+	if (!s) die("strconcat: given null pointer");
 
 	int len, i;
 	char *ret;
@@ -74,7 +74,7 @@ strconcat(char **s, int c)
 char **
 strsplit(const char *s, const char a_delim, int *size)
 {
-	if (s == NULL) die("strsplit: given null pointer");
+	if (!s) die("strsplit: given null pointer");
 
 	char **ret = 0;
 	size_t count = 0;
