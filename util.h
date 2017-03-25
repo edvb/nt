@@ -10,8 +10,4 @@ void *emalloc(size_t size);
 void *erealloc(void *p, size_t size);
 char *estrdup(char *s);
 
-char *strconcat(char **s, int c);
-char **strsplit(const char *s, const char a_delim, int *size);
-char *strtrim(char *s);
-
 void die(const char *errstr, ...);

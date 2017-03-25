@@ -4,10 +4,15 @@
 nt  \- simple note taker
 .SH SYNOPSIS
 .PP
-\fB\fCnt\fR [\fB\-Dlvy\fP] [\fB\-f\fP \fIFILE\fP] [\fB\-e\fP \fINOTE\fP] [\fB\-d\fP \fINOTE\fP] [\fB\-s\fP \fISEARCH\fP] [\fB\-n\fP \fINUM\fP | \fB\-NUM\fP] [\fINOTE\fP ...]
+\fB\fCnt\fR [\fB\-Dlvy\fP] [\fB\-f\fP \fIFILE\fP] [\fB\-e\fP \fINOTE\fP] [\fB\-d\fP \fINOTE\fP] [\fB\-s\fP \fISEARCH\fP] [\fB\-t\fP [\fITAG\fP]] [\fB\-n\fP \fINUM\fP | \fB\-NUM\fP] [\fINOTE\fP ...]
 .SH DESCRIPTION
 .PP
-Simple note taker for the command line.
+Simple note taker for the command line. To take a note simply run the command
+with the new note as arguments or from stdin. The note will be saved to a plain
+text file with each line being a note. The file is saved to the file either
+specified with \fB\-f\fP or in the default one from \fB\fCconfig.h\fR\&. Notes can have tags
+by prefixing the note with a tag followed by a colon. For example a note
+\fB\fCchores: take out trash\fR will have the tag \fB\fCchores\fR\&.
 .SH OPTIONS
 .PP
 \fB\-d\fP \fINOTE\fP
@@ -30,6 +35,9 @@ Simple note taker for the command line.
 .PP
 \fB\-s\fP \fISEARCH\fP
     Search for pattern \fISEARCH\fP in notes
+.PP
+\fB\-t\fP [\fITAG\fP]
+    Search for \fITAG\fP in notes, list all tags if no \fITAG\fP is given
 .PP
 \fB\-v\fP
     Print version info and exit

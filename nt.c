@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,8 +20,13 @@ typedef struct Note {
 } Note;
 
 /* functions */
-int confirm(const char *msg, ...);
 void linkadd(char *str);
+int confirm(const char *msg, ...);
+char *get_tag(char *str);
+
+char *strconcat(char **s, int c);
+char *strtrim(char *s);
+int strinlist(char *str, char **list, int listc);
 
 void nt_del(void);
 void nt_del_all(void);
@@ -46,25 +52,6 @@ int neednt = 1;
 int lsnum;
 
 #include "config.h"
-
-/* prompt user if no -y option to confirm action */
-int
-confirm(const char *msg, ...)
-{
-	if (yes) return 1;
-
-	char input = 'n';
-	va_list ap;
-
-	va_start(ap, msg);
-	printf("%s: ", argv0);
-	vprintf(msg, ap);
-	printf("? [y/N] ");
-	va_end(ap);
-	scanf("%c", &input);
-
-	return (input == 'y' || input == 'Y') ? 1 : 0;
-}
 
 /* add str to Note linked list */
 void
@@ -93,7 +80,91 @@ linkadd(char *str)
 	cur->str = estrdup(str);
 	cur->next = NULL;
 	tail = cur;
+}
 
+/* prompt user if no -y option to confirm action */
+int
+confirm(const char *msg, ...)
+{
+	if (yes) return 1;
+
+	char input = 'n';
+	va_list ap;
+
+	va_start(ap, msg);
+	printf("%s: ", argv0);
+	vprintf(msg, ap);
+	printf("? [y/N] ");
+	va_end(ap);
+	scanf("%c", &input);
+
+	return (input == 'y' || input == 'Y') ? 1 : 0;
+}
+
+/* return just tag from str */
+char *
+get_tag(char *str)
+{
+	if (!str) die("get_tag: given null pointer");
+	char *tag = estrdup(str);
+	strtok(tag, ":");
+	return tag;
+}
+
+/* compress array of strings to single string */
+char *
+strconcat(char **s, int c)
+{
+	if (!s) die("strconcat: given null pointer");
+
+	int len, i;
+	char *ret;
+
+	for (i = 0; i < c; i++)
+		len += strlen(s[i]) + 1;
+	ret = ecalloc(len, sizeof(char));
+
+	strcpy(ret, s[0]);
+	strcat(ret, " ");
+	for (i = 1; i < c; i++) {
+		strcat(ret, s[i]);
+		strcat(ret, " ");
+	}
+
+	return ret;
+}
+
+/* remove tailing or leading white space from s */
+char *
+strtrim(char *s)
+{
+	char *end;
+
+	/* trim leading space */
+	while (isspace((unsigned char)*s)) s++;
+
+	if (*s == 0) /* all spaces? */
+		return s;
+
+	/* trim trailing space */
+	end = s + strlen(s) - 1;
+	while (end > s && isspace((unsigned char)*end)) end--;
+
+	/* write new null terminator */
+	*(end+1) = 0;
+
+	return s;
+}
+
+/* return if str is in the list */
+int
+strinlist(char *str, char **list, int listc)
+{
+	int i;
+	for (i = 0; i < listc; i++)
+		if (strcmp(str, list[i]) == 0)
+			return 1;
+	return 0;
 }
 
 /* delete oldest matching note from notes */
@@ -190,6 +261,28 @@ nt_search(void)
 		die("%s: search: '%s' not found", argv0, sub);
 }
 
+/* list all tags or all notes with a given tag */
+void
+nt_tag(void)
+{
+	Note *cur = head;
+	char **tag = ecalloc(1, sizeof(char*));
+	int tagc = 0, i;
+
+	for (; cur; cur = cur->next, tagc++) {
+		tag = erealloc(tag, (tagc+2) * sizeof(char*));
+		tag[tagc] = get_tag(cur->str);
+		if (strcmp(sub, "") == 0 && !strinlist(tag[tagc], tag, tagc))
+			printf("%s\n", tag[tagc]);
+		else if (strcmp(sub, tag[tagc]) == 0)
+			printf("%s\n", cur->str);
+	}
+
+	for (i = 0; i < tagc; i++)
+		free(tag[i]);
+	free(tag);
+}
+
 /* create a new note */
 void
 nt_new(void)
@@ -244,7 +337,7 @@ void
 usage(void)
 {
 	die("usage: %s [-Dlvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
-		"          [-s SEARCH] [-n NUM | -NUM] [NOTE ...]", argv0);
+		"          [-s SEARCH] [-t [TAG]] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
 int
@@ -283,6 +376,10 @@ main(int argc, char *argv[])
 	case 's':
 		mode = nt_search;
 		break;
+	case 't':
+		mode = nt_tag;
+		neednt = 0;
+		break;
 	case 'v': 
 		printf("%s v%s\n", argv0, VERSION);
 		return 0;
@@ -306,5 +403,4 @@ main(int argc, char *argv[])
 	cleanup();
 
 	return 0;
-
 }

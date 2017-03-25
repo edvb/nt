@@ -2,11 +2,16 @@
 
 ## SYNOPSIS
 
-`nt` [**-Dlvy**] [**-f** *FILE*] [**-e** *NOTE*] [**-d** *NOTE*] [**-s** *SEARCH*] [**-n** *NUM* | **-NUM**] [*NOTE* ...]
+`nt` [**-Dlvy**] [**-f** *FILE*] [**-e** *NOTE*] [**-d** *NOTE*] [**-s** *SEARCH*] [**-t** [*TAG*]] [**-n** *NUM* | **-NUM**] [*NOTE* ...]
 
 ## DESCRIPTION
 
-Simple note taker for the command line.
+Simple note taker for the command line. To take a note simply run the command
+with the new note as arguments or from stdin. The note will be saved to a plain
+text file with each line being a note. The file is saved to the file either
+specified with **-f** or in the default one from `config.h`. Notes can have tags
+by prefixing the note with a tag followed by a colon. For example a note
+`chores: take out trash` will have the tag `chores`.
 
 ## OPTIONS
 
@@ -30,6 +35,9 @@ Simple note taker for the command line.
 
 **-s** *SEARCH*
 	Search for pattern *SEARCH* in notes
+
+**-t** [*TAG*]
+	Search for *TAG* in notes, list all tags if no *TAG* is given
 
 **-v**
 	Print version info and exit
