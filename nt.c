@@ -27,6 +27,7 @@ char *get_tag(char *str);
 char *strconcat(char **s, int c);
 char *strtrim(char *s);
 int strinlist(char *str, char **list, int listc);
+int charinstr(char c, char *str);
 
 void nt_del(void);
 void nt_del_all(void);
@@ -106,8 +107,15 @@ char *
 get_tag(char *str)
 {
 	if (!str) die("get_tag: given null pointer");
+
 	char *tag = estrdup(str);
-	strtok(tag, ":");
+	char delim[2] = { tagdelim, 0 };
+
+	if (charinstr(tagdelim, str))
+		strtok(tag, delim);
+	else
+		tag = NULL;
+
 	return tag;
 }
 
@@ -160,9 +168,20 @@ strtrim(char *s)
 int
 strinlist(char *str, char **list, int listc)
 {
+	if (!str || !list) return 0;
 	int i;
 	for (i = 0; i < listc; i++)
-		if (strcmp(str, list[i]) == 0)
+		if (list[i] && strcmp(str, list[i]) == 0)
+			return 1;
+	return 0;
+}
+
+int
+charinstr(char c, char *str)
+{
+	if (!str) return 0;
+	for (; *str; str++)
+		if (*str == c)
 			return 1;
 	return 0;
 }
@@ -271,7 +290,8 @@ nt_tag(void)
 
 	for (; cur; cur = cur->next, tagc++) {
 		tag = erealloc(tag, (tagc+2) * sizeof(char*));
-		tag[tagc] = get_tag(cur->str);
+		if (!(tag[tagc] = get_tag(cur->str)))
+			continue;
 		if (strcmp(sub, "") == 0 && !strinlist(tag[tagc], tag, tagc))
 			printf("%s\n", tag[tagc]);
 		else if (strcmp(sub, tag[tagc]) == 0)
