@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-`nt` [**-Dlvy**] [**-f** *FILE*] [**-e** *NOTE*] [**-d** *NOTE*] [**-s** *SEARCH*] [**-t** [*TAG*]] [**-n** *NUM* | **-NUM**] [*NOTE* ...]
+`nt` [**-Dilvy**] [**-f** *FILE*] [**-e** *NOTE*] [**-d** *NOTE*] [**-s** *SEARCH*] [**-t** [*TAG*]] [**-n** *NUM* | **-NUM**] [*NOTE* ...]
 
 ## DESCRIPTION
 
@@ -26,6 +26,9 @@ by prefixing the note with a tag followed by a colon. For example a note
 
 **-f** *FILE*
 	Load *FILE* instead of default one
+
+**-i**
+	Force prompt to confirm action
 
 **-l**
 	List notes

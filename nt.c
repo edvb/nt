@@ -336,7 +336,7 @@ cleanup(void)
 void
 usage(void)
 {
-	die("usage: %s [-Dlvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
+	die("usage: %s [-Dilvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
 		"          [-s SEARCH] [-t [TAG]] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
@@ -358,6 +358,9 @@ main(int argc, char *argv[])
 	case 'f':
 		fname = EARGF(usage());
 		neednt = 0;
+		break;
+	case 'i':
+		yes = 0;
 		break;
 	case 'l':
 		mode = nt_list_all;
