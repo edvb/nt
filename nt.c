@@ -1,5 +1,4 @@
 /* See LICENSE file for copyright and license details. */
-#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +6,7 @@
 #include <unistd.h>
 
 #include "arg.h"
+#include "str.h"
 #include "util.h"
 
 /* macros */
@@ -23,11 +23,6 @@ typedef struct Note {
 void linkadd(char *str);
 int confirm(const char *msg, ...);
 char *get_tag(char *str);
-
-char *strconcat(char **s, int c);
-char *strtrim(char *s);
-int strinlist(char *str, char **list, int listc);
-int charinstr(char c, char *str);
 
 void nt_del(void);
 void nt_del_all(void);
@@ -117,73 +112,6 @@ get_tag(char *str)
 		tag = NULL;
 
 	return tag;
-}
-
-/* compress array of strings to single string */
-char *
-strconcat(char **s, int c)
-{
-	if (!s) die("strconcat: given null pointer");
-
-	int len, i;
-	char *ret;
-
-	for (i = 0; i < c; i++)
-		len += strlen(s[i]) + 1;
-	ret = ecalloc(len, sizeof(char));
-
-	strcpy(ret, s[0]);
-	strcat(ret, " ");
-	for (i = 1; i < c; i++) {
-		strcat(ret, s[i]);
-		strcat(ret, " ");
-	}
-
-	return ret;
-}
-
-/* remove tailing or leading white space from s */
-char *
-strtrim(char *s)
-{
-	char *end;
-
-	/* trim leading space */
-	while (isspace((unsigned char)*s)) s++;
-
-	if (*s == 0) /* all spaces? */
-		return s;
-
-	/* trim trailing space */
-	end = s + strlen(s) - 1;
-	while (end > s && isspace((unsigned char)*end)) end--;
-
-	/* write new null terminator */
-	*(end+1) = 0;
-
-	return s;
-}
-
-/* return if str is in the list */
-int
-strinlist(char *str, char **list, int listc)
-{
-	if (!str || !list) return 0;
-	int i;
-	for (i = 0; i < listc; i++)
-		if (list[i] && strcmp(str, list[i]) == 0)
-			return 1;
-	return 0;
-}
-
-int
-charinstr(char c, char *str)
-{
-	if (!str) return 0;
-	for (; *str; str++)
-		if (*str == c)
-			return 1;
-	return 0;
 }
 
 /* delete oldest matching note from notes */
