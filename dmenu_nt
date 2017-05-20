@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# dmenu_nt - dmenu interface for nt
+# See LICENSE file for copyright and license details
+
+prompt="nt"
+cmd="nt $1"
+height=$($cmd -l | wc -l)
+maxheight=20
+
+while
+	if [ "$height" -gt "$maxheight" ]; then height="$maxheight"; fi;
+	note=$($cmd -l | dmenu $2 -l "$height" -p "$prompt:" );
+[ -n "$note" ]; do
+	$cmd -l | grep -q "^$note"
+	if [ $? = 0 ]; then
+		$cmd -dy "$note"
+		if [ "$height" -lt "$maxheight" ]; then height=$((height-1)); fi;
+	else
+		$cmd "$note"
+		height=$((height+1))
+	fi
+done
+
+exit 0
