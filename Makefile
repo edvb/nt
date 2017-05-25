@@ -38,10 +38,13 @@ clean:
 	@echo \ done
 
 install: all
-	@echo -n installing executable file to $(DESTDIR)$(PREFIX)/bin ...
+	@echo -n installing $(EXE) to $(DESTDIR)$(PREFIX)/bin ...
 	@mkdir -p $(DESTDIR)$(PREFIX)/bin
 	@cp -f $(EXE) $(DESTDIR)$(PREFIX)/bin
 	@chmod 755 $(DESTDIR)$(PREFIX)/bin/$(EXE)
+	@echo \ done
+	@echo -n installing dmenu_$(EXE) to $(DESTDIR)$(PREFIX)/bin ...
+	@cp -f dmenu_$(EXE) $(DESTDIR)$(PREFIX)/bin
 	@echo \ done
 	@echo -n installing manual page to $(DESTDIR)$(MANPREFIX)/man1 ...
 	@mkdir -p $(DESTDIR)$(MANPREFIX)/man1
