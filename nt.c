@@ -332,7 +332,7 @@ main(int argc, char *argv[])
 		neednt = 0;
 		break;
 	case 'v': 
-		printf("%s v%s\n", argv0, VERSION);
+		printf("%s v%s (c) 2017 Ed van Bruggen\n", argv0, VERSION);
 		return 0;
 	case 'y':
 		yes = 1;
