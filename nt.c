@@ -22,7 +22,7 @@ typedef struct Note {
 /* functions */
 void linkadd(char *str);
 int confirm(const char *msg, ...);
-char *get_tag(char *str);
+char *get_cat(char *str);
 
 void nt_del(void);
 void nt_del_all(void);
@@ -97,21 +97,21 @@ confirm(const char *msg, ...)
 	return (input == 'y' || input == 'Y') ? 1 : 0;
 }
 
-/* return just tag from str */
+/* return just category from str */
 char *
-get_tag(char *str)
+get_cat(char *str)
 {
-	if (!str) die("get_tag: given null pointer");
+	if (!str) die("get_cat: given null pointer");
 
-	char *tag = estrdup(str);
-	char delim[2] = { tagdelim, 0 };
+	char *cat = estrdup(str);
+	char delim[2] = { catdelim, 0 };
 
-	if (charinstr(tagdelim, str))
-		strtok(tag, delim);
+	if (charinstr(catdelim, str))
+		strtok(cat, delim);
 	else
-		tag = NULL;
+		cat = NULL;
 
-	return tag;
+	return cat;
 }
 
 /* delete oldest matching note from notes */
@@ -208,27 +208,27 @@ nt_search(void)
 		die("%s: search: '%s' not found", argv0, sub);
 }
 
-/* list all tags or all notes with a given tag */
+/* list all categories or all notes with a given category */
 void
-nt_tag(void)
+nt_cat(void)
 {
 	Note *cur = head;
-	char **tag = ecalloc(1, sizeof(char*));
-	int tagc = 0, i;
+	char **cat = ecalloc(1, sizeof(char*));
+	int catc = 0, i;
 
-	for (; cur; cur = cur->next, tagc++) {
-		tag = erealloc(tag, (tagc+2) * sizeof(char*));
-		if (!(tag[tagc] = get_tag(cur->str)))
+	for (; cur; cur = cur->next, catc++) {
+		cat = erealloc(cat, (catc+2) * sizeof(char*));
+		if (!(cat[catc] = get_cat(cur->str)))
 			continue;
-		if (strcmp(sub, "") == 0 && !strinlist(tag[tagc], tag, tagc))
-			printf("%s\n", tag[tagc]);
-		else if (strcmp(sub, tag[tagc]) == 0)
+		if (strcmp(sub, "") == 0 && !strinlist(cat[catc], cat, catc))
+			printf("%s\n", cat[catc]);
+		else if (strcmp(sub, cat[catc]) == 0)
 			printf("%s\n", cur->str);
 	}
 
-	for (i = 0; i < tagc; i++)
-		free(tag[i]);
-	free(tag);
+	for (i = 0; i < catc; i++)
+		free(cat[i]);
+	free(cat);
 }
 
 /* create a new note */
@@ -285,7 +285,7 @@ void
 usage(void)
 {
 	die("usage: %s [-Dilvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
-		"          [-s SEARCH] [-t [TAG]] [-n NUM | -NUM] [NOTE ...]", argv0);
+		"          [-s SEARCH] [-c [CATEGORY]] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
 int
@@ -327,8 +327,8 @@ main(int argc, char *argv[])
 	case 's':
 		mode = nt_search;
 		break;
-	case 't':
-		mode = nt_tag;
+	case 'c':
+		mode = nt_cat;
 		neednt = 0;
 		break;
 	case 'v': 
