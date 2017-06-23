@@ -122,7 +122,7 @@ nt_del(void)
 	Note *cur = head;
 
 	for (; cur; cur = cur->next) {
-		if (strcmp(cur->str, sub) == 0) {
+		if (!strcmp(cur->str, sub)) {
 			if (confirm("delete note '%s'", cur->str)) {
 				if (!cur->prev) { /* beginning */
 					head = cur->next;
@@ -155,13 +155,13 @@ nt_del_all(void)
 
 /* edit given note sub from stdin */
 void
-nt_edit()
+nt_edit(void)
 {
 	if (!sub) usage();
 	Note *cur = head;
 
 	for (; cur; cur = cur->next)
-		if (strcmp(cur->str, sub) == 0) {
+		if (!strcmp(cur->str, sub)) {
 			fgets(cur->str, MAX_SUB, stdin);
 			strtrim(cur->str);
 			return;
@@ -220,9 +220,9 @@ nt_cat(void)
 		cat = erealloc(cat, (catc+2) * sizeof(char*));
 		if (!(cat[catc] = get_cat(cur->str)))
 			continue;
-		if (strcmp(sub, "") == 0 && !strinlist(cat[catc], cat, catc))
+		if (!strcmp(sub, "") && !strinlist(cat[catc], cat, catc))
 			printf("%s\n", cat[catc]);
-		else if (strcmp(sub, cat[catc]) == 0)
+		else if (!strcmp(sub, cat[catc]))
 			printf("%s\n", cur->str);
 	}
 
