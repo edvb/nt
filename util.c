@@ -13,7 +13,7 @@ ecalloc(size_t nmemb, size_t size)
 	void *p;
 
 	if (!(p = calloc(nmemb, size)))
-		die("calloc: out of memory");
+		die("calloc:");
 
 	return p;
 }
@@ -24,7 +24,7 @@ emalloc(size_t size)
 	void *p;
 
 	if (!(p = malloc(size)))
-		die("malloc: out of memory");
+		die("malloc:");
 
 	return p;
 }
@@ -33,7 +33,7 @@ void *
 erealloc(void *p, size_t size)
 {
 	if (!(p = realloc(p, size)))
-		die("realloc: out of memory");
+		die("realloc:");
 
 	return p;
 }
@@ -42,7 +42,7 @@ char *
 estrdup(char *s)
 {
 	if (!(s = strdup(s)))
-		die("strdup: out of memory");
+		die("strdup:");
 
 	return s;
 }

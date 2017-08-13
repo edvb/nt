@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <libgen.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -284,8 +285,8 @@ cleanup(void)
 void
 usage(void)
 {
-	die("usage: %s [-Dilvy] [-f FILE] [-e NOTE] [-d NOTE]\n"
-		"          [-s SEARCH] [-c [CATEGORY]] [-n NUM | -NUM] [NOTE ...]", argv0);
+	die("usage: %s [-Dilyv] [-f FILE] [-e NOTE] [-d NOTE]\n"
+	    "          [-s SEARCH] [-c [CATEGORY]] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
 int
@@ -301,11 +302,9 @@ main(int argc, char *argv[])
 		break;
 	case 'e':
 		mode = nt_edit;
-		neednt = 0;
 		break;
 	case 'f':
 		fname = EARGF(usage());
-		neednt = 0;
 		break;
 	case 'i':
 		yes = 0;
@@ -331,12 +330,12 @@ main(int argc, char *argv[])
 		mode = nt_cat;
 		neednt = 0;
 		break;
-	case 'v': 
-		printf("%s v%s (c) 2017 Ed van Bruggen\n", argv0, VERSION);
-		return 0;
 	case 'y':
 		yes = 1;
 		break;
+	case 'v':
+		printf("%s v%s (c) 2017 Ed van Bruggen\n", argv0, VERSION);
+		return 0;
 	default:
 		usage();
 	} ARGEND;

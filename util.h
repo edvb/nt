@@ -10,4 +10,4 @@ void *emalloc(size_t size);
 void *erealloc(void *p, size_t size);
 char *estrdup(char *s);
 
-void die(const char *errstr, ...);
+void die(const char *fmt, ...);
