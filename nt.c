@@ -248,7 +248,8 @@ setup(void)
 
 	/* load file if it exists */
 	if (access(fname, F_OK) != -1) {
-		fp = fopen(fname, "r");
+		if (!(fp = fopen(fname, "r")))
+			die("%s: %s:", argv0, fname);
 		while (fscanf(fp, "%2048[^\n]\n", buf) != EOF)
 			linkadd(buf);
 		fclose(fp);
@@ -266,7 +267,8 @@ cleanup(void)
 	Note *cur = head;
 
 	/* write note list to file */
-	fp = fopen(fname, "w");
+	if (!(fp = fopen(fname, "w")))
+		die("%s: %s:", argv0, fname);
 	for (; cur; cur = cur->next)
 		if (cur->str)
 			fprintf(fp, "%s\n", cur->str);
