@@ -54,8 +54,6 @@ int lsnum;
 void
 linkadd(char *str)
 {
-	if (!str) die("linkadd: given null pointer");
-
 	if (!head->str && !head->next && !head->prev) {
 		head = ecalloc(1, sizeof(Note));
 		head->str  = estrdup(str);
@@ -83,10 +81,10 @@ linkadd(char *str)
 int
 confirm(const char *msg, ...)
 {
-	if (yes) return 1;
-
 	char input = 'n';
 	va_list ap;
+
+	if (yes) return 1;
 
 	va_start(ap, msg);
 	printf("%s: ", argv0);
@@ -102,8 +100,6 @@ confirm(const char *msg, ...)
 char *
 get_cat(char *str)
 {
-	if (!str) die("get_cat: given null pointer");
-
 	char *cat = estrdup(str);
 	char delim[2] = { catdelim, 0 };
 
