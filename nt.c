@@ -103,7 +103,7 @@ get_cat(char *str)
 	char *cat = estrdup(str);
 	char delim[2] = { catdelim, 0 };
 
-	if (charinstr(catdelim, str))
+	if (strchr(str, catdelim))
 		strtok(cat, delim);
 	else
 		cat = NULL;

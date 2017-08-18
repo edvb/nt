@@ -62,13 +62,3 @@ strinlist(char *str, char **list, int listc)
 			return 1;
 	return 0;
 }
-
-int
-charinstr(char c, char *str)
-{
-	if (!str) return 0;
-	for (; *str; str++)
-		if (*str == c)
-			return 1;
-	return 0;
-}
