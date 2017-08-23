@@ -63,10 +63,14 @@ uninstall:
 	@rm -f $(DESTDIR)$(MANPREFIX)/man1/$(EXE).1
 	@echo \ done
 
-update-man:
+man:
 	@echo -n updating man page $(EXE).1 ...
 	@cat README.md | sed "s/# $(EXE)/# $(EXE) 1\n\n##NAME\n\n$(EXE) /" | \
 		md2man-roff | sed "s/\\[la\]/\</" | sed "s/\\[ra\]/\>/" > $(EXE).1
 	@echo \ done
 
-.PHONY: all options clean install uninstall update-man
+test: $(EXE)
+	@rm -f todo list
+	@clitest --prefix tab README.md
+
+.PHONY: all options clean install uninstall man test
