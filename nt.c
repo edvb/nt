@@ -30,7 +30,6 @@ void nt_del_all(void);
 void nt_edit(void);
 void nt_list_all(void);
 void nt_list_n(void);
-void nt_search(void);
 void nt_new(void);
 
 void setup(void);
@@ -188,23 +187,6 @@ nt_list_n(void)
 			printf("%s\n", cur->str);
 }
 
-/* search notes for given note */
-void
-nt_search(void)
-{
-	if (!sub) usage();
-	int found = 0;
-	Note *cur = head;
-
-	for (; cur; cur = cur->next)
-		if (strstr(cur->str, sub)) {
-			printf("%s\n", cur->str);
-			found = 1;
-		}
-	if (!found)
-		die("%s: search: '%s' not found", argv0, sub);
-}
-
 /* list all categories or all notes with a given category */
 void
 nt_cat(void)
@@ -284,7 +266,7 @@ void
 usage(void)
 {
 	die("usage: %s [-Dilyv] [-f FILE] [-e NOTE] [-d NOTE]\n"
-	    "          [-s SEARCH] [-c [CATEGORY]] [-n NUM | -NUM] [NOTE ...]", argv0);
+	    "          [-c [CATEGORY]] [-n NUM | -NUM] [NOTE ...]", argv0);
 }
 
 int
@@ -320,9 +302,6 @@ main(int argc, char *argv[])
 		mode = nt_list_n;
 		neednt = 0;
 		lsnum = ARGNUMF();
-		break;
-	case 's':
-		mode = nt_search;
 		break;
 	case 'c':
 		mode = nt_cat;

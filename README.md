@@ -2,7 +2,7 @@
 
 ## SYNOPSIS
 
-`nt` [**-Dilvy**] [**-f** *FILE*] [**-e** *NOTE*] [**-d** *NOTE*] [**-s** *SEARCH*] [**-t** [*TAG*]] [**-n** *NUM* | **-NUM**] [*NOTE* ...]
+`nt` [**-Dilvy**] [**-f** *FILE*] [**-e** *NOTE*] [**-d** *NOTE*] [**-t** [*TAG*]] [**-n** *NUM* | **-NUM**] [*NOTE* ...]
 
 ## DESCRIPTION
 
@@ -35,9 +35,6 @@ by prefixing the note with a tag followed by a colon. For example a note
 
 **-n** *NUM*, **-NUM**
 	List last *NUM* notes
-
-**-s** *SEARCH*
-	Search for pattern *SEARCH* in notes
 
 **-t** [*TAG*]
 	Search for *TAG* in notes, list all tags if no *TAG* is given
