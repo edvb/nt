@@ -84,12 +84,12 @@ List just the *NUM* most recent notes:
 	buy pie
 	wash car
 
-Search notes with a specified term:
+Search notes through an external program:
 
-	$ nt -s pie
+	$ nt -l | grep pie
 	buy pie
 	$ nt make pie
-	$ nt -s pie
+	$ nt -l | grep pie
 	buy pie
 	make pie
 
