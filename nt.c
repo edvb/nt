@@ -321,9 +321,14 @@ main(int argc, char *argv[])
 
 	if (argc <= 0 && neednt)
 		fgets(sub, MAX_SUB, stdin);
-	else if (argc > 0)
-		sub = strconcat(argv, argc);
-	strtrim(sub);
+	else if (argc > 0) {
+		while (*argv) {
+			strcat(sub, *argv);
+			if (*(++argv))
+				strcat(sub, " ");
+		}
+	}
+	strtrim(sub); /* TODO replace by stopping newline from stdin */
 
 	mode();
 

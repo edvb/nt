@@ -6,29 +6,6 @@
 
 #include "util.h"
 
-/* compress array of strings to single string */
-char *
-strconcat(char **s, int c)
-{
-	if (!s) die("strconcat: given null pointer");
-
-	int len, i;
-	char *ret;
-
-	for (i = 0; i < c; i++)
-		len += strlen(s[i]) + 1;
-	ret = ecalloc(len, sizeof(char));
-
-	strcpy(ret, s[0]);
-	strcat(ret, " ");
-	for (i = 1; i < c; i++) {
-		strcat(ret, s[i]);
-		strcat(ret, " ");
-	}
-
-	return ret;
-}
-
 /* remove tailing or leading white space from s */
 char *
 strtrim(char *s)
