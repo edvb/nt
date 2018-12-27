@@ -54,7 +54,7 @@ void
 linkadd(char *str)
 {
 	if (!head->str && !head->next && !head->prev) {
-		head = ecalloc(1, sizeof(Note));
+		head = emalloc(sizeof(Note));
 		head->str  = estrdup(str);
 		head->next = NULL;
 		head->prev = NULL;
@@ -68,7 +68,7 @@ linkadd(char *str)
 		cur = cur->next;
 
 	/* allocate note */
-	cur->next = ecalloc(1, sizeof(Note));
+	cur->next = emalloc(sizeof(Note));
 	cur->next->prev = cur;
 	cur = cur->next;
 	cur->str = estrdup(str);
@@ -180,9 +180,9 @@ nt_list_all(void)
 void
 nt_list_n(void)
 {
-	int i;
+	int i = 0;
 	Note *cur = tail;
-	for (i = 0; i < lsnum && cur; cur = cur->prev, i++)
+	for (; i < lsnum && cur; cur = cur->prev, i++)
 		if (cur->str)
 			printf("%s\n", cur->str);
 }
@@ -192,22 +192,22 @@ void
 nt_cat(void)
 {
 	Note *cur = head;
-	char **cat = ecalloc(1, sizeof(char*));
+	char **cats = ecalloc(1, sizeof(char*));
 	int catc = 0, i;
 
 	for (; cur; cur = cur->next, catc++) {
-		cat = erealloc(cat, (catc+2) * sizeof(char*));
-		if (!(cat[catc] = get_cat(cur->str)))
+		cats = erealloc(cats, (catc+2) * sizeof(char*));
+		if (!(cats[catc] = get_cat(cur->str)))
 			continue;
-		if (!strcmp(sub, "") && !strinlist(cat[catc], cat, catc))
-			printf("%s\n", cat[catc]);
-		else if (!strcmp(sub, cat[catc]))
+		if (!strcmp(sub, "") && !strinlist(cats[catc], cats, catc)) /* TODO strlist */
+			printf("%s\n", cats[catc]);
+		else if (!strcmp(sub, cats[catc]))
 			printf("%s\n", cur->str);
 	}
 
 	for (i = 0; i < catc; i++)
-		free(cat[i]);
-	free(cat);
+		free(cats[i]);
+	free(cats);
 }
 
 /* create a new note */
